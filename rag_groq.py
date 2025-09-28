@@ -23,8 +23,7 @@ ASTRA_COLLECTION = os.getenv("ASTRA_DB_COLLECTION", "agentragcoll")
 
 # assert GROQ_API_KEY, "Set GROQ_API_KEY in .env"
 # assert OPENAI_API_KEY, "Set OPENAI_API_KEY in .env"
-if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY not set in environment variables")
+
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
@@ -122,8 +121,9 @@ def format_sources(source_docs):
 
 
 def answer(question: str):
+    if not GROQ_API_KEY:
+        raise ValueError("GROQ_API_KEY not set in environment variables")
     res = agent.run(input=question)  
-    
     
     source_docs = retriever.get_relevant_documents(question)
     sources_formatted = format_sources(source_docs)
