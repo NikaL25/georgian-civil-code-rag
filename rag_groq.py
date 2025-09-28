@@ -37,12 +37,13 @@ if ASTRA_TOKEN and ASTRA_ENDPOINT:
         api_endpoint=ASTRA_ENDPOINT,
         token=ASTRA_TOKEN,
         collection_name=ASTRA_COLLECTION,
-        embedding=emb
+        embedding=emb,
+        
     )
 else:
     print("AstraDB not configured — load local FAISS from ./faiss_index")
     emb = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
-    vstore = FAISS.load_local("./faiss_index", embedding=emb)
+    vstore = FAISS.load_local("./faiss_index", embedding=emb, allow_dangerous_deserialization=True)
 
 retriever = vstore.as_retriever(search_kwargs={"k": 4})
 
