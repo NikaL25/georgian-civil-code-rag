@@ -43,7 +43,7 @@ else:
     emb = HuggingFaceEmbeddings(
         model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     vstore = FAISS.load_local(
-        "./faiss_index", embedding=emb, allow_dangerous_deserialization=True)
+        "./faiss_index", embeddings=emb, allow_dangerous_deserialization=True)
 
 retriever = vstore.as_retriever(search_kwargs={"k": 4})
 

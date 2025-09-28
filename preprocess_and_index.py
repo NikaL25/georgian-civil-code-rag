@@ -86,7 +86,7 @@ if ASTRA_TOKEN and ASTRA_ENDPOINT:
 else:
     print("AstraDB not configured — using local FAISS fallback.")
     from langchain.vectorstores import FAISS
-    faiss_store = FAISS.from_documents(chunks, embedding=emb)
+    faiss_store = FAISS.from_documents(chunks, embeddings=emb)
     faiss_store.save_local("./faiss_index")
     print("FAISS index saved to ./faiss_index")
 
