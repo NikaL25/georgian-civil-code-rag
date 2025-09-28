@@ -6,14 +6,22 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_astradb.vectorstores import AstraDBVectorStore
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import streamlit as st
 
 load_dotenv()
 
-MATSNE_PDF = os.getenv("MATSNE_PDF_PATH", "matsne_civil_code.pdf")
+def get_secret(section: str, key: str, default=None):
+    try:
+        return st.secrets[section][key]
+    except Exception:
+        return os.getenv(key.upper(), default)
+    
+MATSNE_PDF = get_secret("paths", "matsne_pdf_path", "matsne_civil_code.pdf")
 
-ASTRA_TOKEN = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
-ASTRA_ENDPOINT = os.getenv("ASTRA_DB_API_ENDPOINT")
-ASTRA_COLLECTION = os.getenv("ASTRA_DB_COLLECTION", "agentragcoll")
+# Получаем Astra данные
+ASTRA_TOKEN = get_secret("astra", "db_application_token")
+ASTRA_ENDPOINT = get_secret("astra", "db_api_endpoint")
+ASTRA_COLLECTION = get_secret("astra", "db_collection", "agentragcoll")
 
 article_re = re.compile(r"(მუხლი\s*[0-9]{1,5})", re.IGNORECASE)
 

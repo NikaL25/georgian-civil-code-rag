@@ -9,21 +9,27 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.agents import initialize_agent, Tool, AgentType
 from langchain.memory import ConversationBufferMemory
+import streamlit as st
 
 load_dotenv()
 
-# Env
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_MODEL_NAME = os.getenv(
-    "GROQ_MODEL_NAME", "meta-llama/llama-4-maverick-17b-128e-instruct")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-ASTRA_TOKEN = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
-ASTRA_ENDPOINT = os.getenv("ASTRA_DB_API_ENDPOINT")
-ASTRA_COLLECTION = os.getenv("ASTRA_DB_COLLECTION", "agentragcoll")
+def get_secret(section: str, key: str, default=None):
+    try:
+        # Попытка получить из st.secrets (Streamlit Cloud)
+        return st.secrets[section][key]
+    except Exception:
+        # Если не получилось — из переменных окружения (локально)
+        return os.getenv(key.upper(), default)
 
-# assert GROQ_API_KEY, "Set GROQ_API_KEY in .env"
-# assert OPENAI_API_KEY, "Set OPENAI_API_KEY in .env"
+# Получение переменных конфигурации с гибридом st.secrets / .env
+GROQ_API_KEY = get_secret("groq", "api_key")
+GROQ_MODEL_NAME = get_secret("groq", "model_name")
 
+ASTRA_TOKEN = get_secret("astra", "db_application_token")
+ASTRA_ENDPOINT = get_secret("astra", "db_api_endpoint")
+ASTRA_COLLECTION = get_secret("astra", "db_collection", "agentragcoll")
+
+MATSNE_PDF_PATH = get_secret("paths", "matsne_pdf_path", "matsne_civil_code.pdf")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
@@ -38,7 +44,6 @@ if ASTRA_TOKEN and ASTRA_ENDPOINT:
         token=ASTRA_TOKEN,
         collection_name=ASTRA_COLLECTION,
         embedding=emb,
-        
     )
 else:
     print("AstraDB not configured — load local FAISS from ./faiss_index")
@@ -56,7 +61,7 @@ llm = ChatGroq(
 tools = [
     Tool(
         name="CivilCodeRetrieval",
-        func=lambda q: "\n\n".join([doc.page_content for doc in retriever.get_relevant_documents(q)]),  # Возвращает текст чанков как строку
+        func=lambda q: "\n\n".join([doc.page_content for doc in retriever.get_relevant_documents(q)]),
         description="Searches the Georgian Civil Code for relevant articles. Input should be a legal question in Georgian. Returns relevant text chunks."
     )
 ]
@@ -113,8 +118,7 @@ def format_sources(source_docs):
             if page:
                 src += f" (გვერდი {page})"
         else:
-            src = f"გვერდი {page}" if page else d.metadata.get(
-                "source", "მონაცემები არ არის")
+            src = f"გვერდი {page}" if page else d.metadata.get("source", "მონაცემები არ არის")
         if src not in seen:
             seen.append(src)
             lines.append(f"- {src}")
@@ -143,4 +147,4 @@ if __name__ == "__main__":
             break
         print("Thinking...\n")
         print(answer(q))
-        print("\n" + "-"*40 + "\n") 
+        print("\n" + "-"*40 + "\n")
