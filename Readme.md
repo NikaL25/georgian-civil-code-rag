@@ -95,10 +95,4 @@ streamlit run app_streamlit.py
 
 ## Live Demo
 
-Try the agent without cloning: [Georgian Civil Code RAG Demo](https://-----.streamlit.app) (deployed on Streamlit Cloud).
-
-## Contributing
-
-- Fork the repo and create a pull request.
-- Run tests: `python preprocess_and_index.py` and query in console.
-- Issues? Open a GitHub issue.
+Try the agent without cloning: [Georgian Civil Code RAG Demo](https://nikal25-georgian-civil-code-rag-app-streamlit-mnsyjf.streamlit.app/) (deployed on Streamlit Cloud).
