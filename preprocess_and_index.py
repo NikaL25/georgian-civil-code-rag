@@ -6,22 +6,20 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_astradb.vectorstores import AstraDBVectorStore
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-import streamlit as st
 
 load_dotenv()
 
-def get_secret(section: str, key: str, default=None):
-    try:
-        return st.secrets[section][key]
-    except Exception:
-        return os.getenv(key.upper(), default)
-    
-MATSNE_PDF = get_secret("paths", "matsne_pdf_path", "matsne_civil_code.pdf")
 
-# Получаем Astra данные
-ASTRA_TOKEN = get_secret("astra", "db_application_token")
-ASTRA_ENDPOINT = get_secret("astra", "db_api_endpoint")
-ASTRA_COLLECTION = get_secret("astra", "db_collection", "agentragcoll")
+def get_secret(key: str, default=None):
+    return os.getenv(key.upper(), default)
+
+
+MATSNE_PDF = os.getenv("MATSNE_PDF_PATH", "matsne_civil_code.pdf")
+
+ASTRA_TOKEN = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
+ASTRA_ENDPOINT = os.getenv("ASTRA_DB_API_ENDPOINT")
+ASTRA_COLLECTION = os.getenv(
+    "ASTRA_DB_COLLECTION", "georgiancivilcoderagcollection")
 
 article_re = re.compile(r"(მუხლი\s*[0-9]{1,5})", re.IGNORECASE)
 
@@ -32,9 +30,9 @@ loader = PyPDFLoader(MATSNE_PDF)
 pages = loader.load()
 
 for i, doc in enumerate(pages):
-    text = re.sub(r'\n\s*\n', '\n', doc.page_content.strip())  
-    text = re.sub(r'გვერდი \d+', '', text)  
-    doc.page_content = text  
+    text = re.sub(r'\n\s*\n', '\n', doc.page_content.strip())
+    text = re.sub(r'გვერდი \d+', '', text)
+    doc.page_content = text
 
 print(f"Loaded {len(pages)} pages.")
 
@@ -53,7 +51,8 @@ for i, doc in enumerate(pages):
                 "page": i + 1,
                 "source": f"matsne://matsne_civil_code.pdf#page={i+1}"
             }
-            article_chunks.append(Document(page_content=article_text, metadata=metadata))
+            article_chunks.append(
+                Document(page_content=article_text, metadata=metadata))
 
 print(f"Split into {len(article_chunks)} article chunks.")
 
@@ -71,7 +70,8 @@ chunks = final_chunks
 print(f"Final chunks after splitting long articles: {len(chunks)}")
 
 print("Creating embeddings (HuggingFace paraphrase-multilingual-MiniLM-L12-v2)...")
-emb = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+emb = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 if ASTRA_TOKEN and ASTRA_ENDPOINT:
     print("Using AstraDB vectorstore...")
     vstore = AstraDBVectorStore(
