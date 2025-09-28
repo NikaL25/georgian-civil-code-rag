@@ -23,6 +23,12 @@ ASTRA_COLLECTION = os.getenv("ASTRA_DB_COLLECTION", "agentragcoll")
 
 # assert GROQ_API_KEY, "Set GROQ_API_KEY in .env"
 # assert OPENAI_API_KEY, "Set OPENAI_API_KEY in .env"
+if not GROQ_API_KEY:
+    raise ValueError("GROQ_API_KEY not set in environment variables")
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    print("Warning: OPENAI_API_KEY not set, using fallback if needed")
 
 if ASTRA_TOKEN and ASTRA_ENDPOINT:
     print("Connecting to AstraDB vector store...")
