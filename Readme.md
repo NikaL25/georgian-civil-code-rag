@@ -33,6 +33,7 @@ To run locally:
 
 1. **Clone the Repo**:
    git clone https://github.com/NikaL25/georgian-civil-code-rag.git
+
    cd georgian-civil-code-rag
 
 2. **Create virtual environmet**
