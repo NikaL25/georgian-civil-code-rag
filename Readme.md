@@ -95,4 +95,4 @@ streamlit run app_streamlit.py
 
 ## Live Demo
 
-Try the agent without cloning: [Georgian Civil Code RAG Demo](https://nikal25-georgian-civil-code-rag-app-streamlit-mnsyjf.streamlit.app/) (deployed on Streamlit Cloud).
+Try the agent without cloning: [Georgian Civil Code RAG Demo](https://nikal25-georgian-civil-code-rag-app-streamlit-7eahnx.streamlit.app/) (deployed on Streamlit Cloud).
